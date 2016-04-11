@@ -1,6 +1,6 @@
 import bunyan from 'bunyan';
 import childProcess from 'child_process';
-import * as murmur from 'murmur';
+import { SHA3Hash } from 'sha3';
 import request from 'request-promise';
 
 import FilesystemStore from './store/filesystem';
@@ -8,7 +8,11 @@ import FilesystemStore from './store/filesystem';
 const log = bunyan.createLogger({name: 'filesystem'});
 
 const makeDescription = req => `${req.method} ${req.headers.host}${req.url}`;
-const makeId = str => murmur.hash128(str).hex();
+const makeId = str => {
+  const digest = new SHA3Hash(256);
+  digest.update(str);
+  return digest.digest('hex');
+}
 
 export default class Cache {
   constructor() {
@@ -65,7 +69,7 @@ const realFetch = (store, req, id, description) => {
   });
 };
 
-const doRemoteHTTP = (req) => {
+const doRemoteHTTP = req => {
   const host = req.headers.host.replace(/:.*/, ''); // FIXME: better escaping
 
   return new Promise((resolve, reject) => {

@@ -9,7 +9,7 @@ for (let domain of domains) {
   }
 }
 
-export const shouldMirror = (domain) => {
+export const shouldMirror = domain => {
   if (whitelist['*']) {
     return true;
   }
