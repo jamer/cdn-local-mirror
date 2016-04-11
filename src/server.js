@@ -32,6 +32,8 @@ http.createServer((req, res) => {
 const handleRequest = (req, res) => {
   const host = req.headers.host;
 
+  res.setHeader('Cache-Control', 'max-age=86400');
+
   if (!whitelist.shouldMirror(host)) {
     log.info(`Item not on whitelist: ${host}`);
     res.statusCode = 404;
@@ -45,7 +47,6 @@ const handleRequest = (req, res) => {
     const contentType = responseData.contentType;
     const body = responseData.body;
 
-    res.setHeader('Cache-Control', 'max-age=86400');
     if (contentType) {
       res.setHeader('Content-Type', contentType);
     }
@@ -57,4 +58,4 @@ const handleRequest = (req, res) => {
     res.statusCode = 500;
     res.end('<h1>Mirror failure</h1>');
   });
-}
+};
