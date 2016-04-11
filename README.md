@@ -12,12 +12,18 @@ Install the dependencies.
 npm install
 ```
 
-Make the data directory and create a whitelist.txt with a list of domains that you want to mirror.
+Make the data directory and create a whitelist.txt with a list of domains that
+you want to mirror.
 
 ```bash
 mkdir -p data/fs
 echo bootstrapcdn.com >> whitelist.txt
 ```
+
+If you want to support HTTPS resources then you'll need to make a TLS
+certificate for local-cdn to use. Make sure you install it into your browser or
+OS so that it's accepted. Save the unencrypted private key as key.pem and the
+certificate as cert.pem in the local-cdn's top directory.
 
 Start the server.
 
