@@ -70,7 +70,6 @@ const doRemoteHTTP = (req) => {
 
   return new Promise((resolve, reject) => {
     childProcess.execFile('host', [host], (error, stdout, stderr) => {
-      log.info({error: error, stdout: stdout, stderr: stderr});
       if (error) {
         log.error(`/usr/bin/host error: ${error}`);
         reject(error);
