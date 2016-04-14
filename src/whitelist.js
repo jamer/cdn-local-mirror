@@ -1,13 +1,21 @@
 import fs from 'fs';
 
-const whitelist = {};
-const domains = fs.readFileSync('whitelist.txt', 'utf-8').split('\n');
-for (let domain of domains) {
-  domain = domain.replace(/#.*/, '').trim();
-  if (domain !== '') {
-    whitelist[domain] = true;
+let whitelist = {};
+
+const loadWhitelist = () => {
+  const domains = fs.readFileSync('whitelist.txt', 'utf-8').split('\n');
+  whitelist = {};
+  for (let domain of domains) {
+    domain = domain.replace(/#.*/, '').trim();
+    if (domain !== '') {
+      whitelist[domain] = true;
+    }
   }
-}
+};
+
+loadWhitelist();
+
+fs.watch('whitelist.txt', loadWhitelist);
 
 export const shouldMirror = domain => {
   if (whitelist['*']) {
