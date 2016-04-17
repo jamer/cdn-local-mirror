@@ -7,7 +7,7 @@ import Cache from './cache/cache';
 import * as whitelist from './whitelist';
 
 const cache = new Cache();
-const log = bunyan.createLogger({name: 'filesystem'});
+const log = bunyan.createLogger({name: 'server'});
 
 const HTTP_PORT = process.env.HTTP_PORT || 80;
 const HTTPS_PORT = process.env.HTTPS_PORT || 443;
