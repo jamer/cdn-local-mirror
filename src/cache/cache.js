@@ -12,7 +12,7 @@ const makeId = str => {
   const digest = new SHA3Hash(256);
   digest.update(str);
   return digest.digest('hex');
-}
+};
 
 export default class Cache {
   constructor() {
@@ -26,12 +26,12 @@ export default class Cache {
 
     log.info(`Incoming request for ${description}`);
 
-    return store.exists(id)
-    .then(exists => {
-      if (exists) {
-        return store.read(id);
+    return store.haveSavedRequest(id)
+    .then(yepWeHaveIt => {
+      if (yepWeHaveIt) {
+        return store.readSavedRequest(id);
       } else {
-        return realFetch(store, req, id, description);
+        return fetchAndStoreResult(store, req, id, description);
       }
     })
     .catch(error => {
@@ -41,7 +41,7 @@ export default class Cache {
   }
 }
 
-const realFetch = (store, req, id, description) => {
+const fetchAndStoreResult = (store, req, id, description) => {
   log.info(`Forwarding request to remote`);
 
   return doRemoteHTTP(req)
@@ -49,7 +49,7 @@ const realFetch = (store, req, id, description) => {
     log.info('Remote responded with HTTP 200-ish');
     const contentType = response.headers['content-type'];
     const body = response.body;
-    return store.write(id, description, contentType, body)
+    return store.writeRequest(id, description, contentType, body)
     .then(() => {
       return {statusCode: 200, contentType: contentType, body: body};
     });
@@ -58,7 +58,7 @@ const realFetch = (store, req, id, description) => {
     const statusCode = error && error.response && error.response.statusCode;
     if (statusCode) {
       log.info(`Remote responded with error: ${statusCode}`);
-      return store.writeError(id, description, statusCode)
+      return store.writeRequestError(id, description, statusCode)
       .then(() => {
         return {statusCode: statusCode};
       });

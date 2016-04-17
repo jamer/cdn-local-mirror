@@ -4,7 +4,7 @@ import fs from 'fs';
 const log = bunyan.createLogger({name: 'filesystem'});
 
 export default class FilesystemStore {
-  exists(id) {
+  haveSavedRequest(id) {
     return new Promise((resolve, reject) => {
       fs.access(`./data/fs/${id}-exists`, fs.F_OK, error => {
         if (error && error.code === 'ENOENT') {
@@ -21,12 +21,12 @@ export default class FilesystemStore {
     });
   }
 
-  read(id) {
+  readSavedRequest(id) {
     const bodyPromise = new Promise((resolve, reject) => {
       fs.readFile(`./data/fs/${id}-body`, (error, data) => {
         if (error && error.code === 'ENOENT') {
           log.info(`read(id=${id}) error: ENOENT (okay)`);
-          this.readError(id).then(resolve).catch(reject);
+          this.readSavedError(id).then(resolve).catch(reject);
         } else if (error) {
           log.info(`read(id=${id}) error: ${error}`);
           reject(error);
@@ -57,7 +57,7 @@ export default class FilesystemStore {
     });
   }
 
-  readError(id) {
+  readSavedError(id) {
     return new Promise((resolve, reject) => {
       fs.readFile(`./data/fs/${id}-statusCode`, (error, data) => {
         if (error) {
@@ -72,7 +72,7 @@ export default class FilesystemStore {
     });
   }
 
-  write(id, description, contentType, body) {
+  writeRequest(id, description, contentType, body) {
     return new Promise((resolve, reject) => {
       fs.writeFile(`./data/fs/${id}-exists`, description);
       fs.writeFile(`./data/fs/${id}-description`, description);
@@ -89,7 +89,7 @@ export default class FilesystemStore {
     });
   }
 
-  writeError(id, description, statusCode) {
+  writeRequestError(id, description, statusCode) {
     return new Promise((resolve, reject) => {
       fs.writeFile(`./data/fs/${id}-exists`, description);
       fs.writeFile(`./data/fs/${id}-description`, description);
