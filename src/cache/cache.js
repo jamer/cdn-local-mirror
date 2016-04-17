@@ -72,9 +72,29 @@ const fetchAndStoreResult = (store, req, id, description) => {
 const doRemoteHTTP = req => {
   const host = req.headers.host.replace(/:.*/, ''); // FIXME: better escaping
 
+  return dnsLookup(host)
+  .then(ip => {
+    const method = req.method;
+    const protocol = req.protocol;
+    const port = req.port;
+    const uri = `${protocol}://${ip}:${port}${req.url}`;
+    log.info({uri: uri}, 'Downloading');
+
+    return request({
+      method: method,
+      uri: uri,
+      headers: {'host': host},
+      encoding: null,
+      resolveWithFullResponse: true
+    });
+  });
+};
+
+const dnsLookup = host => {
   return new Promise((resolve, reject) => {
     // Force a DNS network lookup using /usr/bin/host which will
-    // not read /etc/hosts
+    // not read /etc/hosts in case the user has the host set to
+    // 127.0.0.1 which could lead to an infinite loop.
     childProcess.execFile('host', [host], (error, stdout, stderr) => {
       if (error) {
         log.error(`/usr/bin/host error: ${error}`);
@@ -83,29 +103,16 @@ const doRemoteHTTP = req => {
         const lines = stdout && stdout.split('\n');
 
         const ipv4s = lines && lines
-          .map(line => line.match(/has address (.*)/))
-          .filter(a => a);
+            .map(line => line.match(/has address (.*)/))
+            .filter(a => a);
         const ipv6s = lines && lines
-          .map(line => line.match(/has IPv6 address (.*)/))
-          .filter(a => a)
-          .map(ipv6Address => `[${ipv6Address}]`);
+            .map(line => line.match(/has IPv6 address (.*)/))
+            .filter(a => a)
+            .map(ipv6Address => `[${ipv6Address}]`);
         const ip = (ipv4s && ipv4s[0][1]) || (ipv6s && ipv6s[0][1]);
 
         if (ip) {
-          const method = req.method;
-          const protocol = req.protocol;
-          const port = req.port;
-          const uri = `${protocol}://${ip}:${port}${req.url}`;
-          log.info({uri: uri});
-          const options = {
-            method: method,
-            uri: uri,
-            headers: {'host': host},
-            encoding: null,
-            resolveWithFullResponse: true
-          };
-
-          request(options).then(resolve).catch(reject);
+          resolve(ip);
         } else {
           reject(`/usr/bin/host produced no IPs for host=${host}: ${stdout}`)
         }
