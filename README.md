@@ -32,7 +32,7 @@ node src
 ```
 
 The server listens on ports 80 and 443. Any incoming requests whose domain
-isn't within the white list are immediately discarded and are given HTTP 500.
+isn't within the white list are immediately discarded and are given HTTP 404.
 Use the special domain `*` in the white list to allow all requests.
 
 For each request that comes through, local-cdn will check to see if it's
