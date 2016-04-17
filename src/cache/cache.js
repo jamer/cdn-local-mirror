@@ -73,6 +73,8 @@ const doRemoteHTTP = req => {
   const host = req.headers.host.replace(/:.*/, ''); // FIXME: better escaping
 
   return new Promise((resolve, reject) => {
+    // Force a DNS network lookup using /usr/bin/host which will
+    // not read /etc/hosts
     childProcess.execFile('host', [host], (error, stdout, stderr) => {
       if (error) {
         log.error(`/usr/bin/host error: ${error}`);
