@@ -72,7 +72,7 @@ export default class FilesystemStore {
     });
   }
 
-  writeRequest(id, description, contentType, body) {
+  storeRequest(id, description, contentType, body) {
     return new Promise((resolve, reject) => {
       fs.writeFile(`./data/fs/${id}-exists`, description);
       fs.writeFile(`./data/fs/${id}-description`, description);
@@ -89,7 +89,7 @@ export default class FilesystemStore {
     });
   }
 
-  writeRequestError(id, description, statusCode) {
+  storeRequestError(id, description, statusCode) {
     return new Promise((resolve, reject) => {
       fs.writeFile(`./data/fs/${id}-exists`, description);
       fs.writeFile(`./data/fs/${id}-description`, description);

@@ -49,16 +49,18 @@ const fetchAndStoreResult = (store, req, id, description) => {
     log.info('Remote responded with HTTP 200-ish');
     const contentType = response.headers['content-type'];
     const body = response.body;
-    return store.writeRequest(id, description, contentType, body)
+
+    return store.storeRequest(id, description, contentType, body)
     .then(() => {
       return {statusCode: 200, contentType: contentType, body: body};
     });
   })
   .catch(error => {
     const statusCode = error && error.response && error.response.statusCode;
+
     if (statusCode) {
       log.info(`Remote responded with error: ${statusCode}`);
-      return store.writeRequestError(id, description, statusCode)
+      return store.storeRequestError(id, description, statusCode)
       .then(() => {
         return {statusCode: statusCode};
       });
