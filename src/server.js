@@ -56,6 +56,6 @@ const handleRequest = (req, res) => {
   .catch(error => {
     log.error(error);
     res.statusCode = 500;
-    res.end('<h1>Mirror failure</h1>');
+    res.end('local-cdn failure');
   });
 };

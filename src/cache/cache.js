@@ -36,7 +36,7 @@ export default class Cache {
     })
     .catch(error => {
       log.error(error);
-      return {statusCode: 500, body: '<h1>Mirror failure</h1>'};
+      return {statusCode: 500, body: 'local-cdn failure'};
     });
   }
 }
